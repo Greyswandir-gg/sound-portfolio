@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Мара Левина — саунд-дизайн</title>
+    <meta
+      name="description"
+      content="Презентация работ саунд-дизайнера: шесть сцен со звуком в браузере и живой микшер слоёв."
+    />
+    <meta name="theme-color" content="#0c0b0a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%230c0b0a' width='32' height='32'/%3E%3Cpath d='M3 16h3l3-8 4 16 4-11 3 5h9' fill='none' stroke='%23e7a23a' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#works">К работам</a>
+    <div id="glow" aria-hidden="true"></div>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="wordmark" href="#top">Левина</a>
+        <nav class="nav-links" aria-label="Разделы">
+          <a href="#works">Работы</a>
+          <a href="#mixer">Микшер</a>
+          <a href="#approach">Подход</a>
+          <a href="#contact">Контакт</a>
+        </nav>
+        <div class="nav-tools">
+          <p id="nav-now" class="nav-now">тишина</p>
+          <label class="vol">
+            <span class="sr-only">Громкость</span>
+            <input id="volume" type="range" min="0" max="100" value="80" />
+          </label>
+          <button id="mute" type="button" aria-pressed="false">Звук</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <canvas id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="wrap hero-copy">
+          <p class="eyebrow">Саунд-дизайн · кино, игры, комнаты</p>
+          <h1>
+            <span>Мара</span>
+            <span>Левина</span>
+          </h1>
+          <p class="lede">
+            Звук, из которого собирается кадр. Шесть работ ниже можно
+            включить: у каждой короткий этюд, собранный прямо в браузере.
+          </p>
+          <div class="hero-actions">
+            <button id="listen" class="btn" type="button">Слушать работы</button>
+            <a class="text-link" href="#works">Открыть cue sheet</a>
+          </div>
+        </div>
+        <div class="wrap hero-foot">
+          <p>Листайте вниз</p>
+          <p>48 kHz · стерео · сессия 06</p>
+        </div>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>тишина</span><span>фоли</span><span>воздух</span><span>удар</span>
+          <span>металл</span><span>шаг</span><span>комната</span><span>низ</span>
+          <span>зерно</span><span>дилей</span>
+          <span>тишина</span><span>фоли</span><span>воздух</span><span>удар</span>
+          <span>металл</span><span>шаг</span><span>комната</span><span>низ</span>
+          <span>зерно</span><span>дилей</span>
+        </div>
+      </div>
+
+      <section class="section" id="works">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="index">01</p>
+            <div>
+              <h2>Работы</h2>
+              <p class="sub">
+                Cue sheet сессии. Выберите сцену — справа откроется карточка.
+                Если звук уже идёт, следующая работа подхватит эфир.
+              </p>
+            </div>
+          </div>
+
+          <div class="filters" role="radiogroup" aria-label="Фильтр работ">
+            <button type="button" role="radio" data-filter="all" aria-checked="true">Все</button>
+            <button type="button" role="radio" data-filter="film" aria-checked="false">Кино</button>
+            <button type="button" role="radio" data-filter="game" aria-checked="false">Игры</button>
+            <button type="button" role="radio" data-filter="ad" aria-checked="false">Реклама</button>
+            <button type="button" role="radio" data-filter="series" aria-checked="false">Сериалы</button>
+            <button type="button" role="radio" data-filter="install" aria-checked="false">Инсталляции</button>
+            <button type="button" role="radio" data-filter="anim" aria-checked="false">Анимация</button>
+          </div>
+
+          <div class="works-layout">
+            <article id="stage" class="stage">
+              <canvas id="stage-canvas" aria-hidden="true"></canvas>
+              <div class="stage-top">
+                <p class="stage-kicker">
+                  <span id="stage-cat"></span>
+                  <span aria-hidden="true">·</span>
+                  <span id="stage-year"></span>
+                </p>
+                <p id="stage-num" class="stage-num"></p>
+              </div>
+              <h3 id="stage-title"></h3>
+              <p id="stage-text"></p>
+              <div class="facts">
+                <div>
+                  <span>Роль</span>
+                  <strong id="fact-role"></strong>
+                </div>
+                <div>
+                  <span>В этюде</span>
+                  <strong id="fact-hear"></strong>
+                </div>
+                <div>
+                  <span>Петля</span>
+                  <strong id="fact-len"></strong>
+                </div>
+              </div>
+              <div class="stage-actions">
+                <button id="stage-play" class="btn" type="button">Слушать этюд</button>
+                <button id="stage-prev" class="btn btn-ghost" type="button">Назад</button>
+                <button id="stage-next" class="btn btn-ghost" type="button">Дальше</button>
+                <button id="present" class="btn btn-ghost" type="button">На экран</button>
+              </div>
+              <p id="stage-note" class="note"></p>
+            </article>
+
+            <div class="sheet">
+              <div class="sheet-head" aria-hidden="true">
+                <span>#</span>
+                <span>Сцена</span>
+                <span>Формат</span>
+                <span>Год</span>
+              </div>
+              <ol id="cue-list" class="cue-list"></ol>
+              <p class="hint">Стрелки на списке двигают сцену. Пробел в пустом месте страницы — пуск и стоп.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="mixer">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="index">02</p>
+            <div>
+              <h2>Микшер «Севера»</h2>
+              <p class="sub">
+                Четыре слоя одного кадра. Двигайте фейдеры, пока сцена звучит —
+                ветер можно оставить один, удар придвинуть ближе.
+              </p>
+            </div>
+          </div>
+
+          <div class="console" id="console">
+            <div class="faders">
+              <div class="fader">
+                <div class="meter" aria-hidden="true"><span data-meter="air"></span></div>
+                <div class="fader-copy">
+                  <span class="fader-name">Воздух</span>
+                  <span class="fader-val" data-val="air">72</span>
+                </div>
+                <input data-layer="air" type="range" min="0" max="100" value="72" aria-label="Воздух" />
+              </div>
+              <div class="fader">
+                <div class="meter" aria-hidden="true"><span data-meter="drone"></span></div>
+                <div class="fader-copy">
+                  <span class="fader-name">Дрон</span>
+                  <span class="fader-val" data-val="drone">80</span>
+                </div>
+                <input data-layer="drone" type="range" min="0" max="100" value="80" aria-label="Дрон" />
+              </div>
+              <div class="fader">
+                <div class="meter" aria-hidden="true"><span data-meter="hits"></span></div>
+                <div class="fader-copy">
+                  <span class="fader-name">Удары</span>
+                  <span class="fader-val" data-val="hits">58</span>
+                </div>
+                <input data-layer="hits" type="range" min="0" max="100" value="58" aria-label="Удары" />
+              </div>
+              <div class="fader">
+                <div class="meter" aria-hidden="true"><span data-meter="tone"></span></div>
+                <div class="fader-copy">
+                  <span class="fader-name">Тон</span>
+                  <span class="fader-val" data-val="tone">46</span>
+                </div>
+                <input data-layer="tone" type="range" min="0" max="100" value="46" aria-label="Тон" />
+              </div>
+            </div>
+            <div class="presets" role="group" aria-label="Пресеты микшера">
+              <button type="button" data-preset="wind">Только ветер</button>
+              <button type="button" data-preset="hit">Удар ближе</button>
+              <button type="button" data-preset="full">Полная сцена</button>
+            </div>
+            <div class="console-bar">
+              <button id="mixer-play" class="btn" type="button">Запустить сцену</button>
+              <p class="note">Фейдеры живые. Это тот же «Север», только по слоям.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="approach">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="index">03</p>
+            <div>
+              <h2>Как собирается сцена</h2>
+              <p class="sub">Сначала тишина. Потом только то, без чего кадр врёт.</p>
+            </div>
+          </div>
+          <ol class="steps">
+            <li>
+              <span>01</span>
+              <h3>Бриф</h3>
+              <p>Что зритель должен почувствовать в этой секунде — страх, цена, холод, близость.</p>
+            </li>
+            <li>
+              <span>02</span>
+              <h3>Запись</h3>
+              <p>Пол, ткань, воздух, металл. Часто ночью, когда город не спорит с микрофоном.</p>
+            </li>
+            <li>
+              <span>03</span>
+              <h3>Сборка</h3>
+              <p>Слои, ритм и решение, какой слой убрать. Лишний звук выдаёт сцену быстрее, чем тихий.</p>
+            </li>
+            <li>
+              <span>04</span>
+              <h3>Сдача</h3>
+              <p>Стемы, которые монтаж можно сдвинуть на кадр, и финальный микс.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section contact" id="contact">
+        <div class="wrap contact-inner">
+          <p class="index">04</p>
+          <h2>Новая сцена</h2>
+          <p class="lede">Если нужна картина, которую держит звук — напишите. Шоурил пришлю в ответ.</p>
+          <a class="mail" href="mailto:hello@maralevina.sound?subject=Проект%20для%20саунд-дизайна">hello@maralevina.sound</a>
+          <p class="sub">Москва · удалённо</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <p>© 2026 Мара Левина</p>
+        <p>Этюды звучат из браузера и показывают характер сцены.</p>
+      </div>
+    </footer>
+
+    <aside id="dock" class="dock" aria-hidden="true">
+      <div class="wrap dock-inner">
+        <span id="dock-dot" class="dot" aria-hidden="true"></span>
+        <div class="dock-copy">
+          <strong id="dock-title">Тишина</strong>
+          <span id="dock-meta"></span>
+        </div>
+        <canvas id="dock-canvas" aria-hidden="true"></canvas>
+        <span id="dock-time" class="dock-time">0:00</span>
+        <button id="dock-toggle" class="btn" type="button">Дальше</button>
+        <button id="dock-stop" class="btn btn-ghost" type="button">Стоп</button>
+      </div>
+    </aside>
+
+    <p id="live" class="sr-only" aria-live="polite"></p>
+    <script src="main.js"></script>
+  </body>
+</html>
