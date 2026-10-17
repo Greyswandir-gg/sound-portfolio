@@ -1,3 +1,10 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+__pycache__/
+
+# Записи из резюме. Среди видео есть файл больше лимита GitHub.
+media/
+
+# Пароль админки. Не коммитить.
+admin.secret

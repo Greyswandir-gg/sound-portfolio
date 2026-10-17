@@ -110,8 +110,10 @@ a { color: inherit; }
 .wordmark {
   font-family: var(--display);
   font-weight: 700;
+  font-size: clamp(0.72rem, 1.6vw, 0.95rem);
   letter-spacing: -0.04em;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-links,
@@ -141,6 +143,10 @@ a { color: inherit; }
   letter-spacing: 0.04em;
   text-transform: lowercase;
   min-width: 7rem;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .vol input { width: 5.5rem; }
@@ -198,6 +204,11 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.0
 h1 {
   font-size: clamp(4.2rem, 13vw, 9.2rem);
   line-height: 0.84;
+}
+
+h1.brand {
+  font-size: clamp(1.15rem, 5.6vw, 4.4rem);
+  white-space: nowrap;
 }
 
 h1 span { display: block; animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
@@ -329,11 +340,18 @@ h2 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 0.95; }
 }
 
 #stage-canvas,
-#dock-canvas {
+#dock-canvas,
+#stage-video {
   width: 100%;
   height: 96px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.28);
+}
+
+#stage-video {
+  height: 220px;
+  object-fit: contain;
+  background: #000;
 }
 
 .stage-top {
@@ -432,8 +450,9 @@ h2 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 0.95; }
 
 .cue-name {
   font-family: var(--display);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   letter-spacing: -0.04em;
+  line-height: 1.15;
 }
 
 .console {
@@ -543,6 +562,35 @@ input[type="range"]::-moz-range-thumb {
   text-underline-offset: 0.18em;
 }
 
+.admin { max-width: 40rem; }
+.admin-title { font-size: clamp(2.4rem, 6vw, 4.2rem); margin: 0.3rem 0 0.6rem; }
+.admin-list-title { margin: 1.6rem 0 0.6rem; font-size: 1.4rem; }
+.admin-card, .added { display: grid; gap: 0.8rem; }
+.admin-card {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+.admin-card label { display: grid; gap: 0.35rem; color: var(--muted); font-size: 0.86rem; }
+.admin-card input, .admin-card select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  color: var(--ink);
+}
+.added { list-style: none; margin: 0; padding: 0; }
+.added li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding: 0.7rem 0;
+}
+
 .footer {
   border-top: 1px solid var(--line);
   padding: 1.2rem 0 2rem;
@@ -550,7 +598,28 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.86rem;
 }
 
-.footer-inner { justify-content: space-between; }
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 1.5rem 0 0.4rem;
+  padding: 0;
+}
+
+.socials a,
+.footer a {
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+}
+
+.socials a:hover,
+.footer a:hover { border-color: var(--tone); color: var(--tone); }
+
+.footer-inner { justify-content: space-between; flex-wrap: wrap; }
 .footer p, .nav-now { margin: 0; }
 
 .dock {
@@ -594,6 +663,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #stage:fullscreen #stage-canvas { height: 24vh; }
+#stage:fullscreen #stage-video { height: 42vh; }
 #stage:fullscreen #stage-title { font-size: clamp(3.5rem, 8vw, 7rem); }
 
 @keyframes rise {
@@ -633,6 +703,7 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 760px) {
   h1 { font-size: clamp(3.1rem, 18vw, 5.2rem); }
+  h1.brand { font-size: clamp(0.95rem, 6.4vw, 1.7rem); }
   .nav-links, .nav-now, .vol, .sheet-head, .cue-cat { display: none; }
   .cue { grid-template-columns: 2.2rem minmax(0, 1fr) auto; }
   .hero { min-height: calc(100svh - var(--nav)); }

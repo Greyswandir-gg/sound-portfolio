@@ -1,103 +1,15 @@
 "use strict";
 
-/* Имя на странице — в index.html.
-   Работы — массив WORKS ниже. Поле src (mp3/wav) включает файл вместо этюда. */
-
-const WORKS = [
-  {
-    id: "north",
-    num: "01",
-    title: "Север",
-    cat: "film",
-    catLabel: "Кино",
-    year: "2025",
-    role: "Саунд-дизайн, фоли, сведение",
-    length: "петля",
-    text: "Полный метр про полярную станцию. Музыки почти нет: ветер, лёд далеко, шаги по насту.",
-    hear: "Низкий дрон, воздух и редкий удар.",
-    note: "Этюд собран в браузере и держит холод сцены, это не финальный микс фильма.",
-    tone: "#9ec9ff",
-  },
-  {
-    id: "ash",
-    num: "02",
-    title: "Ash Protocol",
-    cat: "game",
-    catLabel: "Игра",
-    year: "2025",
-    role: "Оружие, интерфейс, атмосферы",
-    length: "петля",
-    text: "Тактический шутер. Оружие сухое, интерфейс звучит как металл по металлу, без геройской музыки.",
-    hear: "Пульс, короткие удары, свип раз в такт.",
-    note: "Игровой этюд: ритм интерфейса и боя, без финальных ассетов.",
-    tone: "#ff6a3d",
-  },
-  {
-    id: "aurum",
-    num: "03",
-    title: "AURUM",
-    cat: "ad",
-    catLabel: "Реклама",
-    year: "2024",
-    role: "Саунд-дизайн и микс",
-    length: "петля",
-    text: "Ролик механических часов. Каждый щелчок должен звучать дорого и попадать в макросъёмку шестерни.",
-    hear: "Точный тик, тихий аккорд, редкая искра.",
-    note: "Рекламный этюд: механика и тишина вокруг неё.",
-    tone: "#e7a23a",
-  },
-  {
-    id: "night",
-    num: "04",
-    title: "Ночная смена",
-    cat: "series",
-    catLabel: "Сериал",
-    year: "2023",
-    role: "Атмосфера, фоли, тон комнаты",
-    length: "петля",
-    text: "Диспетчерская после полуночи. Лампа, плёнка, низкий гул стоек. Диалоги садятся в эту комнату.",
-    hear: "Тёплый низ, треск, узкий шум.",
-    note: "Этюд комнаты. Голосов нет — только место, где они будут звучать.",
-    tone: "#e0b07a",
-  },
-  {
-    id: "room",
-    num: "05",
-    title: "Комната 7",
-    cat: "install",
-    catLabel: "Инсталляция",
-    year: "2024",
-    role: "Пространственный звук",
-    length: "петля",
-    text: "Тёмная комната. Задержка около трети секунды: звук возвращается чуть другим, чем ушёл.",
-    hear: "Пэд, дилей, редкие капли.",
-    note: "Этюд пространства. В зале это несколько каналов, здесь — стерео.",
-    tone: "#c4b2ff",
-  },
-  {
-    id: "paper",
-    num: "06",
-    title: "Бумажный город",
-    cat: "anim",
-    catLabel: "Анимация",
-    year: "2023",
-    role: "Саунд-дизайн",
-    length: "петля",
-    text: "Бумажные улицы, короткие шаги и ноты, которые не перевешивают картинку.",
-    hear: "Пентатоника и сухие щелчки.",
-    note: "Лёгкий этюд: ритм шагов и бумага, без оркестра.",
-    tone: "#d7e7c8",
-  },
-];
+/* Карточки работ — в works.js */
 
 const PRESETS = {
-  wind: { air: 100, drone: 18, hits: 0, tone: 0 },
-  hit: { air: 36, drone: 48, hits: 100, tone: 22 },
-  full: { air: 72, drone: 80, hits: 58, tone: 46 },
+  color: { color: 100, gun: 0, robot: 0, ultra: 0 },
+  guns: { color: 0, gun: 100, robot: 35, ultra: 80 },
+  all: { color: 70, gun: 70, robot: 70, ultra: 70 },
 };
 
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const state = { activeId: "north", filter: "all" };
+const state = { activeId: "score-01", filter: "all" };
 
 const $ = (sel) => document.querySelector(sel);
 const engine = new Engine();
@@ -151,9 +63,23 @@ function render() {
   $("#fact-len").textContent = work.length;
   $("#stage-note").textContent = work.note;
 
+  const video = $("#stage-video");
+  const canvas = $("#stage-canvas");
+  if (work.video) {
+    video.hidden = false;
+    canvas.hidden = true;
+    if (video.dataset.current !== work.video && !(engine.mode === "work" && engine.workId === work.id)) {
+      video.dataset.current = work.video;
+      video.src = work.video;
+    }
+  } else {
+    video.hidden = true;
+    canvas.hidden = false;
+  }
+
   const playingThis = engine.mode === "work" && engine.workId === work.id;
   const playBtn = $("#stage-play");
-  playBtn.textContent = playingThis ? "Остановить" : "Слушать этюд";
+  playBtn.textContent = playingThis ? "Остановить" : (work.video ? "Смотреть" : "Слушать");
   playBtn.classList.toggle("is-playing", playingThis);
   playBtn.setAttribute("aria-pressed", playingThis ? "true" : "false");
 
@@ -171,7 +97,7 @@ function render() {
 
   const mixerOn = engine.mode === "mixer";
   const mixerBtn = $("#mixer-play");
-  mixerBtn.textContent = mixerOn ? "Остановить сцену" : "Запустить сцену";
+  mixerBtn.textContent = mixerOn ? "Остановить удары" : "Запустить удары";
   mixerBtn.classList.toggle("is-playing", mixerOn);
   mixerBtn.setAttribute("aria-pressed", mixerOn ? "true" : "false");
 
@@ -181,8 +107,8 @@ function render() {
   $("#dock").setAttribute("aria-hidden", live ? "false" : "true");
 
   if (engine.mode === "mixer") {
-    $("#nav-now").textContent = "Север · микшер";
-    $("#dock-title").textContent = "Север";
+    $("#nav-now").textContent = "удары · микшер";
+    $("#dock-title").textContent = "Удары";
     $("#dock-meta").textContent = "четыре слоя";
     $("#dock-toggle").textContent = "Дальше";
   } else if (engine.mode === "work") {
@@ -200,12 +126,12 @@ function render() {
   }
 
   const label = live
-    ? `Сейчас звучит ${engine.mode === "mixer" ? "микшер Севера" : workById(engine.workId).title}`
+    ? `Сейчас звучит ${engine.mode === "mixer" ? "микшер ударов" : workById(engine.workId).title}`
     : `Выбрано: ${work.title}`;
   if ($("#live").textContent !== label) $("#live").textContent = label;
   document.title = live
-    ? `${engine.mode === "mixer" ? "Север" : workById(engine.workId).title} — Мара Левина`
-    : "Мара Левина — саунд-дизайн";
+    ? `${engine.mode === "mixer" ? "Удары" : workById(engine.workId).title} — ${AUTHOR}`
+    : `${AUTHOR} — музыка и саунд-дизайн`;
 }
 
 async function runAudio(action) {
@@ -237,9 +163,24 @@ function step(dir, focusCue) {
   selectWork(next.id, { focusCue, autoplay: Boolean(engine.mode) });
 }
 
+function cueSpan(className, text) {
+  const span = document.createElement("span");
+  span.className = className;
+  span.textContent = text;
+  return span;
+}
+
+function workWord(count) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return "работа";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "работы";
+  return "работ";
+}
+
 function buildCues() {
   const list = $("#cue-list");
-  list.innerHTML = "";
+  list.replaceChildren();
   WORKS.forEach((work) => {
     const item = document.createElement("li");
     item.dataset.cat = work.cat;
@@ -247,7 +188,12 @@ function buildCues() {
     btn.type = "button";
     btn.className = "cue";
     btn.dataset.id = work.id;
-    btn.innerHTML = `<span class="cue-num">${work.num}</span><span class="cue-name">${work.title}</span><span class="cue-cat">${work.catLabel}</span><span class="cue-year">${work.year}</span>`;
+    btn.append(
+      cueSpan("cue-num", work.num),
+      cueSpan("cue-name", work.title),
+      cueSpan("cue-cat", work.catLabel),
+      cueSpan("cue-year", work.length),
+    );
     btn.addEventListener("click", () => selectWork(work.id, { autoplay: true }));
     item.appendChild(btn);
     list.appendChild(item);
@@ -424,9 +370,9 @@ function drawWave(canvas, amplify, center) {
 }
 
 function drawMeters() {
-  ["air", "drone", "hits", "tone"].forEach((name) => {
+  ["color", "gun", "robot", "ultra"].forEach((name) => {
     const bar = document.querySelector(`[data-meter="${name}"]`);
-    const analyser = engine.layerAnalysers[name];
+    const analyser = engine.mixAnalysers && engine.mixAnalysers[name];
     let level = 0.06;
     if (analyser && engine.mode === "mixer") {
       analyser.getByteTimeDomainData(meterBuf);
@@ -458,17 +404,44 @@ function frame() {
   drawWave(stageCanvas, playing ? 2.1 : 1, 0.5);
   drawWave(dockCanvas, playing ? 2.2 : 1, 0.5);
   drawMeters();
-  if (engine.mode) $("#dock-time").textContent = fmt(engine.elapsed());
+  if (engine.mode) {
+    const now = fmt(engine.elapsed());
+    $("#dock-time").textContent = engine.duration ? `${now} / ${fmt(engine.duration)}` : now;
+  }
+}
+
+async function loadExtraWorks() {
+  try {
+    const response = await fetch("data/works-extra.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const extra = await response.json();
+    if (!Array.isArray(extra)) return;
+    extra.forEach((item) => {
+      if (!item || typeof item.id !== "string" || typeof item.title !== "string") return;
+      if (WORKS.some((work) => work.id === item.id)) return;
+      WORKS.push(item);
+    });
+  } catch (error) {
+    /* файл каталога необязателен при открытии страницы с диска */
+  }
 }
 
 function boot() {
-  buildCues();
-  bind();
-  const hash = location.hash.replace("#", "");
-  if (workById(hash)) state.activeId = hash;
-  applyFilter("all");
-  engine.setMaster(0.8);
-  requestAnimationFrame(frame);
+  loadExtraWorks().then(() => {
+    WORKS.forEach((work, index) => {
+      work.num = String(index + 1).padStart(2, "0");
+    });
+    const session = $("#session-count");
+    if (session) session.textContent = `стерео · ${WORKS.length} ${workWord(WORKS.length)}`;
+    buildCues();
+    bind();
+    const hash = location.hash.replace("#", "");
+    if (workById(hash)) state.activeId = hash;
+    applyFilter("all");
+    engine.onend = () => render();
+    engine.setMaster(0.8);
+    requestAnimationFrame(frame);
+  });
 }
 
 function Engine() {
@@ -485,6 +458,15 @@ function Engine() {
   this.muted = false;
   this.gen = 0;
   this.startedAt = 0;
+  this.duration = 0;
+  this.clockEl = null;
+  this.onend = null;
+  this.audio = null;
+  this.video = null;
+  this.mixReady = false;
+  this.mixGains = null;
+  this.mixAnalysers = null;
+  this.mixEls = null;
   this.analyser = null;
   this.noise = null;
   this.impulses = {};
@@ -521,9 +503,20 @@ Engine.prototype.unlock = async function unlock() {
   }
 };
 
+Engine.prototype.pauseMedia = function pauseMedia() {
+  [this.audio, this.video].forEach((el) => {
+    if (!el) return;
+    el.onended = null;
+    el.pause();
+  });
+  if (this.mixEls) Object.values(this.mixEls).forEach((el) => el.pause());
+  this.clockEl = null;
+};
+
 Engine.prototype.halt = function halt() {
   this.gen += 1;
   this.token += 1;
+  this.pauseMedia();
   this.timers.splice(0).forEach(clearTimeout);
   if (this.ctx) {
     const t = this.ctx.currentTime;
@@ -618,19 +611,89 @@ Engine.prototype.send = function send(dest, seconds, amount) {
   return input;
 };
 
+Engine.prototype.wireElement = function wireElement(el) {
+  if (el._wired) return;
+  const node = this.ctx.createMediaElementSource(el);
+  node.connect(this.pre);
+  el._wired = true;
+};
+
+Engine.prototype.ensureAudio = function ensureAudio() {
+  if (!this.audio) {
+    this.audio = document.createElement("audio");
+    this.audio.preload = "auto";
+    this.audio.hidden = true;
+    document.body.appendChild(this.audio);
+    this.wireElement(this.audio);
+  }
+  return this.audio;
+};
+
+Engine.prototype.ensureVideo = function ensureVideo() {
+  this.video = document.getElementById("stage-video");
+  this.wireElement(this.video);
+  return this.video;
+};
+
+Engine.prototype.playElement = function playElement(el, url, token, loop) {
+  el.onended = null;
+  el.loop = Boolean(loop);
+  if (el.id === "stage-video") {
+    el.hidden = false;
+    el.dataset.current = url;
+  }
+  if (el.getAttribute("src") !== url) el.src = url;
+  this.clockEl = el;
+  this.duration = Number.isFinite(el.duration) ? el.duration : 0;
+  el.onloadedmetadata = () => {
+    if (token === this.token) this.duration = el.duration || 0;
+  };
+  el.onended = () => {
+    if (token !== this.token || el.loop) return;
+    this.halt();
+    if (this.onend) this.onend();
+  };
+  return el.play();
+};
+
+Engine.prototype.ensureMixer = function ensureMixer() {
+  if (this.mixReady) return;
+  this.mixGains = {};
+  this.mixAnalysers = {};
+  this.mixEls = {};
+  MIX_LAYERS.forEach((layer) => {
+    const el = new Audio(layer.src);
+    el.loop = true;
+    el.preload = "auto";
+    const gain = this.ctx.createGain();
+    gain.gain.value = 0;
+    const analyser = this.ctx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.75;
+    const node = this.ctx.createMediaElementSource(el);
+    node.connect(gain);
+    gain.connect(analyser);
+    analyser.connect(this.pre);
+    this.mixGains[layer.id] = gain;
+    this.mixAnalysers[layer.id] = analyser;
+    this.mixEls[layer.id] = el;
+  });
+  this.mixReady = true;
+};
+
 Engine.prototype.playWork = async function playWork(id) {
   const gen = ++this.gen;
   await this.unlock();
   if (gen !== this.gen) return false;
   this.halt();
   const token = this.token;
-  const bus = this.makeBus(1);
+  const work = workById(id);
   this.mode = "work";
   this.workId = id;
   this.startedAt = this.ctx.currentTime;
-  const work = workById(id);
-  if (work && work.src) this.playFile(work.src, bus, token);
-  else sketches[id](this, { all: bus }, token);
+  this.duration = 0;
+  if (work.video) await this.playElement(this.ensureVideo(), work.video, token, false);
+  else await this.playElement(this.ensureAudio(), work.src, token, false);
   return true;
 };
 
@@ -639,33 +702,21 @@ Engine.prototype.playMixer = async function playMixer(levels) {
   await this.unlock();
   if (gen !== this.gen) return false;
   this.halt();
-  const token = this.token;
-  const outputs = {};
-  ["air", "drone", "hits", "tone"].forEach((name) => {
-    const level = levels[name] ?? 0.7;
-    const gain = this.ctx.createGain();
-    const now = this.ctx.currentTime;
-    if (level < 0.001) gain.gain.setValueAtTime(0, now);
-    else {
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(level, now + 0.28);
-    }
-    const analyser = this.ctx.createAnalyser();
-    analyser.fftSize = 256;
-    analyser.smoothingTimeConstant = 0.75;
-    gain.connect(analyser);
-    analyser.connect(this.pre);
-    this.track(gain);
-    this.track(analyser);
-    this.buses.push(gain);
-    outputs[name] = gain;
-    this.layerGains[name] = gain;
-    this.layerAnalysers[name] = analyser;
-  });
+  this.ensureMixer();
   this.mode = "mixer";
-  this.workId = "north";
+  this.workId = "hit-color";
   this.startedAt = this.ctx.currentTime;
-  sketches.north(this, outputs, token);
+  this.duration = 0;
+  const now = this.ctx.currentTime;
+  MIX_LAYERS.forEach((layer) => {
+    const level = levels[layer.id] ?? 0.7;
+    const gain = this.mixGains[layer.id];
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(level, now);
+    const el = this.mixEls[layer.id];
+    el.currentTime = 0;
+    el.play();
+  });
   return true;
 };
 
@@ -683,7 +734,7 @@ Engine.prototype.playFile = async function playFile(url, bus, token) {
 };
 
 Engine.prototype.setLayer = function setLayer(name, value) {
-  const gain = this.layerGains[name];
+  const gain = (this.mixGains && this.mixGains[name]) || this.layerGains[name];
   if (!gain || !this.ctx) return;
   gain.gain.cancelScheduledValues(this.ctx.currentTime);
   gain.gain.setTargetAtTime(value, this.ctx.currentTime, 0.03);
@@ -703,6 +754,7 @@ Engine.prototype.setMuted = function setMuted(muted) {
 };
 
 Engine.prototype.elapsed = function elapsed() {
+  if (this.mode === "work" && this.clockEl) return this.clockEl.currentTime || 0;
   if (!this.ctx || !this.mode) return 0;
   return this.ctx.currentTime - this.startedAt;
 };
